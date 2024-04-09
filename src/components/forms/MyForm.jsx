@@ -86,7 +86,10 @@ const MyForm = () => {
   */
   // -------------------- END TRYING TO FETCH COMPANY REPRESENTATIVES --------------------
 
-  const fetchCompanyRepresentatives = async () => {
+  const fetchCompanyRepresentatives = async (company) => {
+    console.log(company);
+    // TODO: Fetching company representatives based on the selected company
+    // 
     // Simulating fetching user data from a public API
     const { data } = await axios.get(
       "https://jsonplaceholder.typicode.com/users/1"
@@ -97,12 +100,10 @@ const MyForm = () => {
   // Function to fetch the data from the API whenever formikState.company change
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["companyRepresentative"],
-    queryFn: fetchCompanyRepresentatives,
+    queryFn: fetchCompanyRepresentatives(formikState.company),
     enabled: !!formikState.company, // Only run the query if formikState.company is truthy
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
 
   console.log("🚀 ~ MyForm ~ data:", data);
 

@@ -90,6 +90,7 @@ const MyForm = () => {
     console.log(company);
     // TODO: Fetching company representatives based on the selected company
     // 
+    alert("API will be called whenever `company` changes")
     // Simulating fetching user data from a public API
     const { data } = await axios.get(
       "https://jsonplaceholder.typicode.com/users/1"

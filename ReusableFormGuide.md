@@ -28,6 +28,7 @@ MyForm is a reusable React component built with Formik to handle form state mana
     - `placeholder`: Placeholder for the field.
     - `withAsterisk`: If the field is required
     - `disabled`: Disable the field
+    - ...
 
 ## 3. API Integration
 

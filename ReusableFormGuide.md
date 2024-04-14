@@ -70,17 +70,17 @@ Implement a form where certain fields are enabled or disabled based on the selec
 ### Scenario
 In our example, the StudentRegistrationForm uses three cascading dropdowns: School, Course, and Subject. Each dropdown is dependent on the selection of the previous one, i.e., users can select a Course only after a School is selected and a Subject only after selecting a Course.
 
-## Fetching Data for Each Dropdown
+### Fetching Data for Each Dropdown
 Each dropdown's options are fetched based on the selection of the previous field. This dependency is managed using React Query's dependency array feature, which re-fetches data when the dependency value changes.
 
 1. Schools Dropdown
-- Fetches all schools initially using the useFetchData hook.
+    - Fetches all schools initially using the useFetchData hook.
 2. Courses Dropdown
-- Fetches courses based on the selected `school`. The fetching process is triggered when the `school` field in the form state changes.
-- Resets the `course` field in the form whenever the school changes to **ensure that stale course selections are not retained**.
+    - Fetches courses based on the selected `school`. The fetching process is triggered when the `school` field in the form state changes.
+    - Resets the `course` field in the form whenever the school changes to **ensure that stale course selections are not retained**.
 3. Subjects Dropdown
-- Similar to the Courses dropdown, the Subjects are fetched based on the selected `course`.
-- Resets the `subject` field whenever the `course` selection changes.
+    - Similar to the Courses dropdown, the Subjects are fetched based on the selected `course`.
+    - Resets the `subject` field whenever the `course` selection changes.
 
 **Code Implementation**
 ```jsx
@@ -118,7 +118,7 @@ const correspondingSubjects = useFetchData(
 );
 ```
 
-## Conditionally Enabling Form Fields
+### Conditionally Enabling Form Fields
 Each dropdown is conditionally enabled based on the selection of the previous field. This is achieved by setting the `disabled` prop of the `FormikControl` based on the presence of selections in the form state.
 ```jsx
 // Inside the form rendering block

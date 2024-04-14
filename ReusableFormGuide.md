@@ -36,9 +36,11 @@ MyForm is a reusable React component built with Formik to handle form state mana
 - Submitting Data: Change the `onSubmit` method to integrate with your backend API.
 
 
-# Example of Adding a New Field
+# Examples
 
-## To add a new field to the form:
+## Adding a New Field
+
+### To add a new field to the form:
 
 ```jsx
 <FormikControl
@@ -50,7 +52,7 @@ MyForm is a reusable React component built with Formik to handle form state mana
 />
 ```
 
-## Handling Form Submission
+### Handling Form Submission
 The `onSubmit` method handles form submissions:
 ```jsx
 
@@ -58,6 +60,94 @@ const onSubmit = (values, { setSubmitting }) => {
   console.log("Form Values:", values);
   // Integrate API submission logic here
 };
+```
+
+## Conditionally Disabled/Enabled Form Elements + Fetching and Populating data using the useFetchData hook
+
+### Objective
+Implement a form where certain fields are enabled or disabled based on the selection of previous fields. This scenario commonly occurs in forms that require a cascading select experience, where the choices in one dropdown determine the available options in the subsequent dropdowns.
+
+### Scenario
+In our example, the StudentRegistrationForm uses three cascading dropdowns: School, Course, and Subject. Each dropdown is dependent on the selection of the previous one, i.e., users can select a Course only after a School is selected and a Subject only after selecting a Course.
+
+## Fetching Data for Each Dropdown
+Each dropdown's options are fetched based on the selection of the previous field. This dependency is managed using React Query's dependency array feature, which re-fetches data when the dependency value changes.
+
+1. Schools Dropdown
+- Fetches all schools initially using the useFetchData hook.
+2. Courses Dropdown
+- Fetches courses based on the selected `school`. The fetching process is triggered when the `school` field in the form state changes.
+- Resets the `course` field in the form whenever the school changes to **ensure that stale course selections are not retained**.
+3. Subjects Dropdown
+- Similar to the Courses dropdown, the Subjects are fetched based on the selected `course`.
+- Resets the `subject` field whenever the `course` selection changes.
+
+**Code Implementation**
+```jsx
+// Inside StudentRegisterForm component
+
+// Fetch schools
+const allSchools = useFetchData(["fetchSchools"], fetchSchools);
+
+// Fetch courses based on the selected school
+const correspondingCourses = useFetchData(
+  ["fetchCorrespondingCourses", formikState.school],
+  async () => {
+    // Reset course field when school changes
+    if (formikState.school) {
+      formikRef.current.setFieldValue("course", "");
+      formikRef.current.setFieldTouched("course", false);
+    }
+    return await fetchCorrespondingCourses(formikState.school);
+  },
+  !!formikState.school // Enable the query when school is selected
+);
+
+// Fetch subjects based on the selected course
+const correspondingSubjects = useFetchData(
+  ["fetchCorrespondingSubjects", formikState.course],
+  async () => {
+    // Reset subject field when course changes
+    if (formikState.course) {
+      formikRef.current.setFieldValue("subject", "");
+      formikRef.current.setFieldTouched("subject", false);
+    }
+    return await fetchCorrespondingSubjects(formikState.course);
+  },
+  !!formikState.course // Enable the query when course is selected
+);
+```
+
+## Conditionally Enabling Form Fields
+Each dropdown is conditionally enabled based on the selection of the previous field. This is achieved by setting the `disabled` prop of the `FormikControl` based on the presence of selections in the form state.
+```jsx
+// Inside the form rendering block
+<FormikControl
+  control="select"
+  label="School"
+  name="school"
+  options={allSchools.data}
+  placeholder="Select your School"
+  withAsterisk
+/>
+<FormikControl
+  control="select"
+  label="Course"
+  name="course"
+  options={correspondingCourses.data}
+  disabled={!formikState.school} // Disable if no school is selected
+  placeholder="Select your Course"
+  withAsterisk
+/>
+<FormikControl
+  control="select"
+  label="Subject"
+  name="subject"
+  options={correspondingSubjects.data}
+  disabled={!formikState.course || !formikState.school} // Disable if no course or school is selected
+  placeholder="Select your Subject"
+  withAsterisk
+/>
 ```
 
 # Files Structure

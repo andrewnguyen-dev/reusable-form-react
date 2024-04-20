@@ -55,11 +55,30 @@ MyForm is a reusable React component built with Formik to handle form state mana
 ### Handling Form Submission
 The `onSubmit` method handles form submissions:
 ```jsx
+import toast from "react-hot-toast";
 
-const onSubmit = (values, { setSubmitting }) => {
-  console.log("Form Values:", values);
-  // Integrate API submission logic here
-};
+const userSubmit = usePostData(async () => {
+  // Your API call logic here
+}, ["exampleQueryKey"]);
+
+// Handler for form submission
+  const onSubmit = async (values, { resetForm, setSubmitting }) => {
+    userSubmit.mutate(values, {
+      onSuccess: () => {
+        // Handle success form submission here. For example:
+        toast.success("Form submitted successfully");
+        resetForm(); // Reset form after submission if needed
+      },
+      onError: (err) => {
+        // Handle error here:
+        console.error(err);
+        toast.error("Form submission failed");
+      },
+      onSettled: () => {
+        setSubmitting(false); // Set submitting state to false after form submission
+      },
+    });
+  };
 ```
 
 ## Conditionally Disabled/Enabled Form Elements + Fetching and Populating data using the useFetchData hook
